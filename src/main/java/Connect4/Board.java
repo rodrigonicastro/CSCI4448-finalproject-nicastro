@@ -7,14 +7,23 @@ public class Board{
     int PLAYER1 = 1;
     int PLAYER2 = 2;
 
+    private int DEFAULT_NUM_ROWS = 6;
+    private int DEFAULT_NUM_COLS = 7;
+
     private int[][] boardMatrix;
     private int rows;
     private int columns;
 
+    public Board(){
+        this.rows = DEFAULT_NUM_ROWS;
+        this.columns = DEFAULT_NUM_COLS;
+        this.boardMatrix = new int[rows][columns];
+    }
+
     public Board(int rows, int columns){
         this.rows = rows;
         this.columns = columns;
-        boardMatrix = new int[rows][columns];
+        this.boardMatrix = new int[rows][columns];
     }
 
     public int[][] getBoard(){ return boardMatrix; }
@@ -34,5 +43,14 @@ public class Board{
 
     public void displayBoard(){
         
+    }
+
+    public boolean isFull(){
+        for(int[] col : boardMatrix){
+            for(int slot : col){
+                if(slot == 0) return false;
+            }
+        }
+        return true;
     }
 }
