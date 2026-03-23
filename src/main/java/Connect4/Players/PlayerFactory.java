@@ -13,7 +13,7 @@ public class PlayerFactory{
     static final Color DEFAULT_PLAYER1_COLOR = RED;
     static final Color DEFAULT_PLAYER2_COLOR = BLUE;
 
-    public Player createUser(Color color, Board board, int player){ return new User(color, board, player); }
-    public Player createRandomBot(Color color, Board board){ return new RandomBot(color, board, PLAYER2); }
-    public Player createAIBot(Color color, Board board){ return new AIBot(color, board, PLAYER2); }
+    public static Player createUser(Color color, Board board, int player){ return new User(color, board, player); }
+    public static Player createRandomBot(Color color, Board board){ return new RandomBot(color, board, PLAYER2); }
+    public static Player createAIBot(Color color, Board board){ return new AIBot(color, board, PLAYER2); }
 }
