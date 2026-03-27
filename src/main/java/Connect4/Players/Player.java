@@ -38,6 +38,7 @@ abstract public class Player {
     public int getWins(){ return num_wins; }
     public int getDraws(){ return num_draws; }
     public int getLosses(){ return num_losses; }
+    public int getPlayer(){ return player; }
 
     public void incrementWins() { num_wins++; }
     public void incrementDraws() { num_draws++; }
