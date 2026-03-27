@@ -7,9 +7,13 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PlayerTest {
-    public Board createEmptyDefaultBoard(){ return new Board(); }
+    public Board createEmptyDefaultBoard(){
+        Board.getInstance().clearBoard();
+        return Board.getInstance();
+    }
+
     public Board createBoardWithFullColumn(){
-        Board board = new Board();
+        Board board = Board.getInstance();
         int p = 0;
 
         for(int i = 0; i < board.getNumRows(); i++){

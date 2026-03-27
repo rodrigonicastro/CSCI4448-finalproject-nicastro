@@ -1,7 +1,6 @@
 package Connect4;
 
 public class Board{
-    //TRANSFORM BOARD INTO SINGLETON?
     //Board is a 2d array where 0 means a free spot, 1 means player 1 has a coin in that spot, and 2 means player 2 has a coin in that spot
     int FREE = 0;
     int PLAYER1 = 1;
@@ -14,16 +13,23 @@ public class Board{
     private int rows;
     private int columns;
 
-    public Board(){
+    private static Board gameBoard = null;
+
+    private Board(){
         this.rows = DEFAULT_NUM_ROWS;
         this.columns = DEFAULT_NUM_COLS;
         this.boardMatrix = new int[rows][columns];
     }
 
-    public Board(int rows, int columns){
+    private Board(int rows, int columns){
         this.rows = rows;
         this.columns = columns;
         this.boardMatrix = new int[rows][columns];
+    }
+
+    public static Board getInstance(){
+        if(gameBoard == null) gameBoard = new Board();
+        return gameBoard;
     }
 
     public int[][] getBoard(){ return boardMatrix; }
