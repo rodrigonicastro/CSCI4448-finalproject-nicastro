@@ -7,16 +7,14 @@ import static Connect4.GameState.*;
 public class Connect4{
     private Player p1; //always User
     private Player p2; //decide between User, RandomBot, or AIBot
-    private Board board;
     private GameState gameState;
 
     private int turns;
 
-    public Connect4(Board board, Player p1, Player p2){
-        this.board = board;
+    public Connect4(Player p1, Player p2){
         this.p1 = p1;
         this.p2 = p2;
-        this.gameState = MENU;
+        this.gameState = Init;
     }
 
     public void playGame(){
@@ -31,6 +29,10 @@ public class Connect4{
         boolean terminateGame = false;
         while(!terminateGame){
             switch(gameState){
+                case Init:
+                    //initialize p1/p2, set strategies, initialize board, etc;
+                    gameState = MENU;
+                    break;
                 case MENU:
                     //prompt single/two player, config, terminate
                     break;
@@ -52,6 +54,7 @@ public class Connect4{
                         p2.incrementDraws();
                         //show draw message
                     }
+                    resetGame(p1, p2);
                     gameState = Results;
                     break;
                 case Results:
@@ -62,6 +65,7 @@ public class Connect4{
                     //still unsure if this will be implemented
                 case End:
                     terminateGame = true;
+                    //show terminate message
                     break;
             }
         }
@@ -74,5 +78,12 @@ public class Connect4{
         return isBoardFull() || p1.hasConnected4() || p2.hasConnected4();
     }
 
-    public boolean isBoardFull(){ return board.isFull(); }
+    public boolean isBoardFull(){ return Board.getInstance().isFull(); }
+
+    private void resetGame(Player p1, Player p2){
+        p1.resetWon();
+        p2.resetWon();
+
+        Board.getInstance().clearBoard();
+    }
 }

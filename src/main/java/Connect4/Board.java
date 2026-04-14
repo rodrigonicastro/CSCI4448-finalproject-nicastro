@@ -48,13 +48,20 @@ public class Board{
     public int getNumColumns(){ return columns; }
 
     public void displayBoard(){
-        
+        //display the board to the UI
     }
 
     public boolean isFull(){
-        for(int[] col : boardMatrix){
-            for(int slot : col){
-                if(slot == 0) return false;
+        for(int i = 0; i < getNumColumns(); i++){
+            if(!isColumnFull(i)) return false;
+        }
+        return true;
+    }
+
+    public boolean isColumnFull(int col){
+        for(int i = getNumRows()-1; i >= 0; i--){
+            if(getBoard()[i][col] == 0){
+                return false;
             }
         }
         return true;
