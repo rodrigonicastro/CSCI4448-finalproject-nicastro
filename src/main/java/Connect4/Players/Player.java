@@ -2,8 +2,13 @@ package Connect4.Players;
 
 import Connect4.Board;
 import Connect4.Color;
+import Connect4.Strategy.IStrategy;
 
-abstract public class Player {
+import java.util.Random;
+
+public class Player {
+    private final Random rand = new Random();
+
     protected Board board;
     protected int num_wins;
     protected int num_draws;
@@ -12,7 +17,9 @@ abstract public class Player {
     protected int player;
     protected boolean won;
 
-    public Player(Color color, Board board, int player){
+    private IStrategy strategy;
+
+    public Player(Color color, Board board, int player, IStrategy strategy){
         this.num_draws = 0;
         this.num_wins = 0;
         this.num_losses = 0;
@@ -20,9 +27,8 @@ abstract public class Player {
         this.board = board;
         this.player = player;
         this.won = false;
+        this.strategy = strategy;
     }
-
-    abstract int determineMove();
 
     public boolean placeCoin(int column){ //return true if valid placement, false otherwise
         for(int i = board.getNumRows()-1; i >= 0; i--){
@@ -34,6 +40,10 @@ abstract public class Player {
         }
         return false;
     }
+
+    protected IStrategy getStrategy() { return strategy; }
+
+    public void setStrategy(IStrategy strategy) { this.strategy = strategy; }
 
     public int getWins(){ return num_wins; }
     public int getDraws(){ return num_draws; }
@@ -47,12 +57,14 @@ abstract public class Player {
     public boolean hasConnected4(){ return won; }
 
     public void playTurn(){
-        placeCoin(determineMove());
+        placeCoin(strategy.determineMove(this));
     }
 
     public boolean isWinningPlacement(int row, int col){
         return checkVerticalWin(row, col) || checkHorizontalWin(row, col) || checkDiagonalWin(row, col);
     }
+
+    public void resetWon() { won = false; }
 
     private boolean checkVerticalWin(int row, int col){
         int sequenceSize = 0;
@@ -166,5 +178,225 @@ abstract public class Player {
         }
 
         return sequenceSize == 4;
+    }
+
+    public int getDefensePosition(){
+        int opponent = getPlayer() == 1 ? 2 : 1;
+
+        int bestDefensePosition = 0;
+
+        for(int i = 0; i < board.getNumColumns(); i++){
+            if(!board.isColumnFull(i)){
+                if(getOverallRatingForColumn(i, opponent) > getOverallRatingForColumn(bestDefensePosition, opponent)){
+                    bestDefensePosition = i;
+                }
+                else if(getOverallRatingForColumn(i, opponent) == getOverallRatingForColumn(bestDefensePosition, opponent)){
+                    //if two placements are the same, decide randomly
+                    if(rand.nextInt() % 2 == 0) bestDefensePosition = i;
+                }
+            }
+        }
+        return bestDefensePosition;
+    }
+
+    public int getAttackPosition(){
+        int bestAttackPosition = 0;
+
+        for(int i = 0; i < board.getNumColumns(); i++){
+            if(!board.isColumnFull(i)){
+                if(getOverallRatingForColumn(i, player) > getOverallRatingForColumn(bestAttackPosition, player)){
+                    bestAttackPosition = i;
+                }
+                else if(getOverallRatingForColumn(i, player) == getOverallRatingForColumn(bestAttackPosition, player)){
+                    //if two placements are the same, decide randomly
+                    if(rand.nextInt() % 2 == 0) bestAttackPosition = i;
+                }
+            }
+        }
+        return bestAttackPosition;
+    }
+
+    public int getDefenseRating(){
+        //analyze board to determine how effective a defense would be (how many coins P1 has in a row)
+        int biggestRating = 0;
+
+        int opponent = getPlayer() == 1 ? 2 : 1;
+
+        for(int i = 0; i < board.getNumColumns(); i++){
+            int verticalRating = getVerticalRatingForColumn(i, opponent);
+            int horizontalRating = getHorizontalRatingForColumn(i, opponent);
+            int diagonalRating = getDiagonalRatingForColumn(i, opponent);
+
+            biggestRating = Math.max(biggestRating,
+                            Math.max(verticalRating,
+                            Math.max(horizontalRating,
+                                    diagonalRating)));
+        }
+        return biggestRating;
+    }
+
+    public int getAttackRating(){
+        int biggestRating = 0;
+
+        for(int i = 0; i < board.getNumColumns(); i++){
+            int verticalRating = getVerticalRatingForColumn(i, getPlayer());
+            int horizontalRating = getHorizontalRatingForColumn(i, getPlayer());
+            int diagonalRating = getDiagonalRatingForColumn(i, getPlayer());
+
+            biggestRating = Math.max(biggestRating,
+                            Math.max(verticalRating,
+                            Math.max(horizontalRating,
+                                    diagonalRating)));
+        }
+        return biggestRating;
+    }
+
+    public int getOverallRatingForColumn(int column, int player){
+        return Math.max(getVerticalRatingForColumn(column, player),
+                Math.max(getHorizontalRatingForColumn(column, player),
+                getDiagonalRatingForColumn(column, player)));
+    }
+
+    public int getVerticalRatingForColumn(int column, int player){
+        int rating = 0;
+
+        int landingRow = findLandingRow(column);
+
+        if(landingRow <= 0) return rating; //-1 means column is full, 0 means column is empty. On either case, rating is 0
+
+        //look down starting from where the coin would land in this column and count how many of this player's coins are there
+        for(int i = landingRow-1; i >= 0; i--){
+            if(board.getBoard()[landingRow][column] == player) rating++;
+            else break;
+        }
+        return rating;
+    }
+
+    public int getHorizontalRatingForColumn(int column, int player){
+        int landingRow = findLandingRow(column);
+
+        return getLeftRating(column, landingRow, player) + getRightRating(column, landingRow, player);
+    }
+
+    public int getLeftRating(int column, int row, int player){
+        if(column == 0) return 0;
+
+        int leftBorder = Math.max(0, column - 3);
+
+        int rating = 0;
+        for(int i = column - 1; i >= 0; i--){
+            if(board.getBoard()[row][i] == player) rating++;
+            else break;
+        }
+        return rating;
+    }
+
+    public int getRightRating(int column, int row, int player){
+        if(column == board.getNumColumns() - 1) return 0;
+
+        int rightBorder = Math.min(board.getNumColumns() - 1, column + 3);
+
+        int rating = 0;
+        for(int i = column; i <= rightBorder; i++){
+            if(board.getBoard()[row][i] == player) rating++;
+            else break;
+        }
+        return rating;
+    }
+
+    public int getDiagonalRatingForColumn(int column, int player){
+        int landingRow = findLandingRow(column);
+
+        return Math.max(getBottomLeftRating(column, landingRow, player)+getTopRightRating(column, landingRow, player),
+                        getTopLeftRating(column, landingRow, player)+getBottomRightRating(column, landingRow, player));
+    }
+
+    public int getBottomLeftRating(int column, int row, int player){
+        if(column == 0 || row == 0) return 0;
+
+        int leftBorder = Math.max(0, column - 3);
+        int bottomBorder = Math.max(0, row - 3);
+
+        int currCol = column - 1;
+        int currRow = row - 1;
+        int rating = 0;
+        while(currCol >= leftBorder && currRow >= bottomBorder){
+            if(board.getBoard()[currRow][currCol] == player) rating++;
+            else break;
+
+            currCol--;
+            currRow--;
+        }
+
+        return rating;
+    }
+
+    public int getTopRightRating(int column, int row, int player){
+        if(column == board.getNumColumns() - 1 || row == board.getNumRows() - 1) return 0;
+
+        int rightBorder = Math.min(board.getNumColumns() - 1, column + 3);
+        int topBorder = Math.min(board.getNumRows() - 1, row + 3);
+
+        int currCol = column + 1;
+        int currRow = row + 1;
+        int rating = 0;
+        while(currCol <= rightBorder && currRow <= topBorder){
+            if(board.getBoard()[currRow][currCol] == player) rating++;
+            else break;
+
+            currRow++;
+            currCol++;
+        }
+        return rating;
+    }
+
+    public int getTopLeftRating(int column, int row, int player){
+        if(column == 0 || row == board.getNumRows() - 1) return 0;
+
+        int leftBorder = Math.max(0, column - 3);
+        int topBorder = Math.min(board.getNumRows() - 1, row + 3);
+
+        int currCol = column - 1;
+        int currRow = row + 1;
+        int rating = 0;
+        while(currCol >= leftBorder && currRow <= topBorder){
+            if(board.getBoard()[currRow][currCol] == player) rating++;
+            else break;
+
+            currCol--;
+            currRow++;
+        }
+        return rating;
+    }
+
+    public int getBottomRightRating(int column, int row, int player){
+        if(column == board.getNumColumns() - 1 || row == 0) return 0;
+
+        int rightBorder = Math.min(board.getNumColumns() - 1, column + 3);
+        int bottomBorder = Math.max(0, row - 3);
+
+        int currCol = column + 1;
+        int currRow = row - 1;
+        int rating = 0;
+        while(currCol <= rightBorder && currRow >= bottomBorder){
+            if(board.getBoard()[currRow][currCol] == player) rating++;
+            else break;
+
+            currCol++;
+            currRow--;
+        }
+        return rating;
+    }
+
+    public int findLandingRow(int column){
+        //find in which row the coin would land in this column
+        int landingRow = -1;
+        for(int i = 0; i < board.getNumRows(); i++){
+            if(board.getBoard()[i][column] == 0){
+                landingRow = i;
+                break;
+            }
+        }
+        return landingRow;
     }
 }
