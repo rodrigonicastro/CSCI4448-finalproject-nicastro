@@ -1,7 +1,7 @@
-import Connect4.Board;
-import Connect4.Color;
-import Connect4.Players.Player;
-import Connect4.Players.PlayerFactory;
+import connect4.Board;
+import connect4.Color;
+import connect4.players.Player;
+import connect4.players.PlayerFactory;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -41,7 +41,7 @@ public class PlayerTest {
     @Test
     public void testPlaceCoinOnEmptyColumn(){
         Board board = createEmptyDefaultBoard();
-        Player p1 = PlayerFactory.createUser(Color.BLUE, board, 1);
+        Player p1 = PlayerFactory.createUser(1);
 
         boolean valid = p1.placeCoin(0);
 
@@ -55,7 +55,7 @@ public class PlayerTest {
     @Test
     public void testPlaceCoinOnFullColumn(){
         Board board = createBoardWithFullColumn();
-        Player p1 = PlayerFactory.createUser(Color.BLUE, board, 1);
+        Player p1 = PlayerFactory.createUser(1);
         int[][] expectedBoard = board.getBoard();
 
         boolean valid = p1.placeCoin(0);
