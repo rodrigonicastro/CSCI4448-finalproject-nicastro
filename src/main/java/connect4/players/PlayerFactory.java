@@ -1,12 +1,10 @@
-package Connect4.Players;
+package connect4.players;
 
-import Connect4.Board;
-import Connect4.Color;
-import Connect4.Strategy.IStrategy;
-import Connect4.Strategy.StrategyFactory;
+import connect4.Color;
+import connect4.strategy.StrategyFactory;
 
-import static Connect4.Color.BLUE;
-import static Connect4.Color.RED;
+import static connect4.Color.BLUE;
+import static connect4.Color.RED;
 
 public class PlayerFactory{
     static final int PLAYER1 = 1;
@@ -17,13 +15,13 @@ public class PlayerFactory{
 
     static final StrategyFactory stratFac = new StrategyFactory();
 
-    public static Player createUser(Color color, Board board, int player){
-        return new Player(color, board, player, stratFac.newUserStrategy());
+    public static Player createUser(int player){
+        return new Player(player, stratFac.newUserStrategy());
     }
-    public static Player createRandomBot(Color color, Board board, int player){
-        return new Player(color, board, player, stratFac.newRandomBotStrategy());
+    public static Player createRandomBot(int player){
+        return new Player(player, stratFac.newRandomBotStrategy());
     }
-    public static Player createAIBot(Color color, Board board, int player){
-        return new Player(color, board, player, stratFac.newAIBotStrategy());
+    public static Player createAIBot(int player){
+        return new Player(player, stratFac.newAIBotStrategy());
     }
 }

@@ -1,4 +1,4 @@
-package Connect4;
+package connect4;
 
 public class Board{
     //Board is a 2d array where 0 means a free spot, 1 means player 1 has a coin in that spot, and 2 means player 2 has a coin in that spot

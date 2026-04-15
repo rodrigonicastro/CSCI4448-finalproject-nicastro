@@ -1,8 +1,7 @@
-package Connect4.Players;
+package connect4.players;
 
-import Connect4.Board;
-import Connect4.Color;
-import Connect4.Strategy.IStrategy;
+import connect4.Board;
+import connect4.strategy.IStrategy;
 
 import java.util.Random;
 
@@ -13,25 +12,25 @@ public class Player {
     protected int num_wins;
     protected int num_draws;
     protected int num_losses;
-    protected Color color;
+//    protected Color color;
     protected int player;
     protected boolean won;
 
     private IStrategy strategy;
 
-    public Player(Color color, Board board, int player, IStrategy strategy){
+    public Player(int player, IStrategy strategy){
         this.num_draws = 0;
         this.num_wins = 0;
         this.num_losses = 0;
-        this.color = color;
-        this.board = board;
+//        this.color = color;
+        this.board = Board.getInstance();
         this.player = player;
         this.won = false;
         this.strategy = strategy;
     }
 
     public boolean placeCoin(int column){ //return true if valid placement, false otherwise
-        for(int i = board.getNumRows()-1; i >= 0; i--){
+        for(int i = 0; i < board.getNumRows(); i++){
             if(board.getBoard()[i][column] == 0){
                 board.updateBoard(i, column, player);
                 if(isWinningPlacement(i, column)) this.won = true;
@@ -104,7 +103,7 @@ public class Player {
 
     private boolean topLeftToBottomRightWin(int row, int col){
         int topBorder = Math.min(row + 3, board.getNumRows() - 1);
-        int bottomBorder = Math.max(col - 3, 0);
+        int bottomBorder = Math.max(row - 3, 0);
         int leftBorder = Math.max(col - 3, 0);
         int rightBorder = Math.min(col + 3, board.getNumColumns() - 1);
 
@@ -115,10 +114,7 @@ public class Player {
         int currRow = row + 1;
         int currCol = col - 1;
         while(currRow <= topBorder && currCol >= leftBorder){
-            if(board.getBoard()[currRow][currCol] == this.player){
-                sequenceSize++;
-                if(sequenceSize >= 4) break;
-            }
+            if(board.getBoard()[currRow][currCol] == this.player) sequenceSize++;
             else break;
 
             currRow++;
@@ -128,36 +124,30 @@ public class Player {
         currRow = row - 1;
         currCol = col + 1;
         while(currRow >= bottomBorder && currCol <= rightBorder){
-            if(board.getBoard()[currRow][currCol] == this.player){
-                sequenceSize++;
-                if(sequenceSize >= 4) break;
-            }
+            if(board.getBoard()[currRow][currCol] == this.player) sequenceSize++;
             else break;
 
             currRow--;
             currCol++;
         }
 
-        return sequenceSize == 4;
+        return sequenceSize >= 3;
     }
 
     private boolean bottomLeftToTopRightWin(int row, int col){
         int topBorder = Math.min(row + 3, board.getNumRows() - 1);
-        int bottomBorder = Math.max(col - 3, 0);
+        int bottomBorder = Math.max(row - 3, 0);
         int leftBorder = Math.max(col - 3, 0);
         int rightBorder = Math.min(col + 3, board.getNumColumns() - 1);
 
         //BOTTOM-LEFT -> TOP-RIGHT CHECK: take 3 to the bottom left and 3 to the top right. If a sequence of 4 is formed, won
-        //start on placed coin, go to bottom left until hit end of board or no sequence. Then reset to placed coin and check top right
+        //start on placed coin, go to bottom left until hit border or no sequence. Then reset to placed coin and check top right
         int sequenceSize = 0;
 
         int currRow = row - 1;
         int currCol = col - 1;
         while(currRow >= bottomBorder && currCol >= leftBorder){
-            if(board.getBoard()[currRow][currCol] == this.player){
-                sequenceSize++;
-                if(sequenceSize >= 4) break;
-            }
+            if(board.getBoard()[currRow][currCol] == this.player) sequenceSize++;
             else break;
 
             currRow--;
@@ -167,17 +157,14 @@ public class Player {
         currRow = row + 1;
         currCol = col + 1;
         while(currRow <= topBorder && currCol <= rightBorder){
-            if(board.getBoard()[currRow][currCol] == this.player){
-                sequenceSize++;
-                if(sequenceSize >= 4) break;
-            }
+            if(board.getBoard()[currRow][currCol] == this.player) sequenceSize++;
             else break;
 
             currRow++;
             currCol++;
         }
 
-        return sequenceSize == 4;
+        return sequenceSize >= 3;
     }
 
     public int getDefensePosition(){
@@ -266,7 +253,7 @@ public class Player {
 
         //look down starting from where the coin would land in this column and count how many of this player's coins are there
         for(int i = landingRow-1; i >= 0; i--){
-            if(board.getBoard()[landingRow][column] == player) rating++;
+            if(board.getBoard()[i][column] == player) rating++;
             else break;
         }
         return rating;

@@ -1,4 +1,4 @@
-package Connect4;
+package connect4;
 
 public class Main {
     static void main() {

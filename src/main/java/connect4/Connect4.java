@@ -1,8 +1,8 @@
-package Connect4;
+package connect4;
 
-import Connect4.Players.Player;
+import connect4.players.Player;
 
-import static Connect4.GameState.*;
+import static connect4.GameState.*;
 
 public class Connect4{
     private Player p1; //always User

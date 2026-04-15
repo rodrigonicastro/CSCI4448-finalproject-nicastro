@@ -1,8 +1,8 @@
-package Connect4.Strategy;
+package connect4.strategy;
 
-import Connect4.Board;
-import Connect4.Players.Player;
-import Connect4.Strategy.IStrategy;
+import connect4.Board;
+import connect4.players.Player;
+
 import java.util.Random;
 
 

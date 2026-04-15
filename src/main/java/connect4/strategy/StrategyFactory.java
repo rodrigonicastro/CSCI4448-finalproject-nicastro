@@ -1,4 +1,4 @@
-package Connect4.Strategy;
+package connect4.strategy;
 
 public class StrategyFactory{
     public IStrategy newUserStrategy() { return new UserStrategy(); }

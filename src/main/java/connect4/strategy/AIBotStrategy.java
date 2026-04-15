@@ -1,7 +1,6 @@
-package Connect4.Strategy;
+package connect4.strategy;
 
-import Connect4.Board;
-import Connect4.Players.Player;
+import connect4.players.Player;
 
 public class AIBotStrategy implements IStrategy{
     public int determineMove(Player myself){

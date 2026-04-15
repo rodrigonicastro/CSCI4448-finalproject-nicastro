@@ -1,7 +1,6 @@
-package Connect4.Strategy;
+package connect4.strategy;
 
-import Connect4.Players.Player;
-import Connect4.Strategy.IStrategy;
+import connect4.players.Player;
 
 public class UserStrategy implements IStrategy{
     public int determineMove(Player myself){
