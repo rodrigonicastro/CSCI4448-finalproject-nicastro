@@ -139,6 +139,7 @@ public class Connect4Panel extends JPanel {
     public void displayMenu(){
         inMenu = true;
         repaint();
+        inMenu = false;
     }
 
     private void drawMenu(Graphics g){
