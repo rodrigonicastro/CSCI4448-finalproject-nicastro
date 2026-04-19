@@ -10,35 +10,57 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.junit.jupiter.api.AfterEach;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BoardStepDefs {
-    Player p1 = PlayerFactory.createRandomBot(1);
-    Player p2 = PlayerFactory.createRandomBot(2);
+    StepsState state = StepsState.getInstance();
+    Player p1 = state.p1;
+    Player p2 = state.p2;
 
-    Connect4 game = new Connect4(p1, p2);
+    Connect4 game = state.game;
+
+    Board board = state.board;
 
     @Given("an empty board")
     public void anEmptyBoard(){
         Board emptyBoard = Board.getInstance();
         emptyBoard.clearBoard();
+
+        state.updateState(p1, p2, board.getBoard(), game);
     }
 
-    @And("Player {int} is a {word}")
-    public void playerIsPlayerType(int player, String type){
-        if(player == 1){
-            switch(type){
-                case "AIBot" -> p1.setStrategy(new AIBotStrategy());
-                case "RandomBot" -> p1.setStrategy(new RandomBotStrategy());
+    @Given("an almost full board")
+    public void anAlmostFullBoard(){
+        boolean p1Start = false;
+        Board.getInstance().clearBoard();
+
+        for(int i = 0; i < board.getNumColumns(); i++){
+            if(i % 3 == 0) p1Start = !p1Start;
+            for(int j = 0; j < board.getNumRows(); j++){
+                if(j % 2 == 0){
+                    if(p1Start) p1.placeCoin(i);
+                    else p2.placeCoin(i);
+                }
+                else{
+                    if(!p1Start) p1.placeCoin(i);
+                    else p2.placeCoin(i);
+                }
             }
         }
-        else{
-            switch(type){
-                case "AIBot" -> p2.setStrategy(new AIBotStrategy());
-                case "RandomBot" -> p2.setStrategy(new RandomBotStrategy());
-            }
+        Board.getInstance().updateBoard(board.getNumRows()-1, 0, 0);
+        state.updateState(p1, p2, board.getBoard(), game);
+    }
+
+    @Given("column {int} is full")
+    public void giveFullColumn(int col){
+        for(int i = 0; i < Board.getInstance().getNumRows(); i=i+2){
+            p1.placeCoin(col);
+            p2.placeCoin(col);
         }
+
+        state.updateState(p1, p2, board.getBoard(), game);
     }
 
     @And("Player {int} has 3 coins in a row vertically")
@@ -53,6 +75,8 @@ public class BoardStepDefs {
             p2.placeCoin(3);
             p2.placeCoin(3);
         }
+
+        state.updateState(p1, p2, board.getBoard(), game);
     }
 
     @And("Player {int} has 3 coins in a row horizontally")
@@ -67,6 +91,8 @@ public class BoardStepDefs {
             p2.placeCoin(3);
             p2.placeCoin(4);
         }
+
+        state.updateState(p1, p2, board.getBoard(), game);
     }
 
     @And("Player {int} has 3 coins in a row diagonally from bottom-left to top-right")
@@ -99,6 +125,8 @@ public class BoardStepDefs {
             p2.placeCoin(4);
             p1.placeCoin(4);
         }
+
+        state.updateState(p1, p2, board.getBoard(), game);
     }
 
     @And("Player {int} has 3 coins in a row diagonally from top-left to bottom-right")
@@ -131,30 +159,12 @@ public class BoardStepDefs {
             p2.placeCoin(1);
             p1.placeCoin(1);
         }
-    }
 
-    @When("Player {int} plays a turn")
-    public void playerPlaysTurn(int player){
-        if(player == 1){
-            p1.playTurn();
-        }
-        else{
-            p2.playTurn();
-        }
+        state.updateState(p1, p2, board.getBoard(), game);
     }
 
     @Then("the game is over")
     public void gameIsOver(){
         assertTrue(game.isOver());
-    }
-
-    @And("Player {int} won the game")
-    public void playerWonTheGame(int player){
-        if(player == 1){
-            assertTrue(p1.hasConnected4());
-        }
-        else{
-            assertTrue(p2.hasConnected4());
-        }
     }
 }

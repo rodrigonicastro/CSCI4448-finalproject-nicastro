@@ -3,7 +3,6 @@ Feature: Details of AI Bot
   I want to play against an intelligent bot
   So that I can play a more interesting game
 
-
   Scenario: Win the game when possible vertically
     Given an empty board
     And Player 2 is a AIBot

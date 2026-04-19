@@ -271,7 +271,7 @@ public class Player {
         int leftBorder = Math.max(0, column - 3);
 
         int rating = 0;
-        for(int i = column - 1; i >= 0; i--){
+        for(int i = column - 1; i >= leftBorder; i--){
             if(board.getBoard()[row][i] == player) rating++;
             else break;
         }
