@@ -1,5 +1,5 @@
 import connect4.Board;
-import connect4.Color;
+import connect4.Connect4;
 import connect4.players.Player;
 import connect4.players.PlayerFactory;
 import org.junit.jupiter.api.Test;
@@ -25,23 +25,33 @@ public class PlayerTest {
 
     @Test
     public void testUserConstructor(){
-
+        Connect4 game = new Connect4();
+        Player user = PlayerFactory.createUser(1, game);
+        assertTrue(user.isUser());
+        assertEquals(1, user.getPlayer());
     }
 
     @Test
     public void testRandomBotConstructor(){
-
+        Connect4 game = new Connect4();
+        Player bot = PlayerFactory.createRandomBot(2, game);
+        assertTrue(bot.isRandomBot());
+        assertEquals(2, bot.getPlayer());
     }
 
     @Test
     public void testAIBotConstructor(){
-
+        Connect4 game = new Connect4();
+        Player bot = PlayerFactory.createAIBot(2, game);
+        assertTrue(bot.isAIBot());
+        assertEquals(2, bot.getPlayer());
     }
 
     @Test
     public void testPlaceCoinOnEmptyColumn(){
         Board board = createEmptyDefaultBoard();
-        Player p1 = PlayerFactory.createUser(1);
+        Connect4 game = new Connect4();
+        Player p1 = PlayerFactory.createUser(1, game);
 
         boolean valid = p1.placeCoin(0);
 
@@ -55,7 +65,8 @@ public class PlayerTest {
     @Test
     public void testPlaceCoinOnFullColumn(){
         Board board = createBoardWithFullColumn();
-        Player p1 = PlayerFactory.createUser(1);
+        Connect4 game = new Connect4();
+        Player p1 = PlayerFactory.createUser(1, game);
         int[][] expectedBoard = board.getBoard();
 
         boolean valid = p1.placeCoin(0);

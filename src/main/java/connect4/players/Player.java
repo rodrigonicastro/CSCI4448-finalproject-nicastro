@@ -1,6 +1,7 @@
 package connect4.players;
 
 import connect4.Board;
+import connect4.Connect4;
 import connect4.strategy.IStrategy;
 
 import java.util.Random;
@@ -8,26 +9,29 @@ import java.util.Random;
 public class Player {
     private final Random rand = new Random();
 
+    public Connect4 game;
+
     protected Board board;
     protected int num_wins;
     protected int num_draws;
     protected int num_losses;
-//    protected Color color;
     protected int player;
     protected boolean won;
 
     private IStrategy strategy;
 
-    public Player(int player, IStrategy strategy){
+    public Player(int player, IStrategy strategy, Connect4 game){
+        this.game = game;
         this.num_draws = 0;
         this.num_wins = 0;
         this.num_losses = 0;
-//        this.color = color;
         this.board = Board.getInstance();
         this.player = player;
         this.won = false;
         this.strategy = strategy;
     }
+
+    public Connect4 getGame(){ return game; }
 
     public boolean placeCoin(int column){ //return true if valid placement, false otherwise
         for(int i = 0; i < board.getNumRows(); i++){
@@ -58,6 +62,10 @@ public class Player {
     public void playTurn(){
         placeCoin(strategy.determineMove(this));
     }
+
+    public boolean isAIBot(){ return strategy.isAIBot(); }
+    public boolean isRandomBot(){ return strategy.isRandomBot(); }
+    public boolean isUser(){ return strategy.isUser(); }
 
     public boolean isWinningPlacement(int row, int col){
         return checkVerticalWin(row, col) || checkHorizontalWin(row, col) || checkDiagonalWin(row, col);

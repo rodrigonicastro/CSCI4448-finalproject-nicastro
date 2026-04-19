@@ -18,9 +18,10 @@ public class StepsState {
 
     private StepsState(){
         board = Board.getInstance();
-        p1 = PlayerFactory.createRandomBot(1);
-        p2 = PlayerFactory.createRandomBot(2);
-        game = new Connect4(p1, p2);
+        game = new Connect4();
+        p1 = PlayerFactory.createRandomBot(1, game);
+        p2 = PlayerFactory.createRandomBot(2, game);
+        game.addPlayers(p1, p2);
         stateMatrix = board.getBoard();
     }
 

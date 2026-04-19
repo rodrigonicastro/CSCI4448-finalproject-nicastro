@@ -8,33 +8,51 @@ public class Connect4{
     private Player p1; //always User
     private Player p2; //decide between User, RandomBot, or AIBot
     private GameState gameState;
+    public Connect4Panel panel;
 
     private int turns;
 
-    public Connect4(Player p1, Player p2){
-        this.p1 = p1;
-        this.p2 = p2;
+    public Connect4(){
+        panel = new Connect4Panel(this);
         this.gameState = Init;
     }
 
+    public Connect4 addPlayers(Player p1, Player p2){
+        this.p1 = p1;
+        this.p2 = p2;
+        return this;
+    }
+
+    public Connect4Panel getPanel(){ return panel; }
+
+    public Player getP1(){ return p1; }
+    public Player getP2(){ return p2; }
+
     public void playGame(){
         while(!isOver()){
-            if(turns % 2 == 1) p1.playTurn();
-            else p2.playTurn();
+            if(turns % 2 == 1){
+                if(p1.isAIBot() || p1.isRandomBot()) panel.showWaitingMessage();
+                p1.playTurn();
+            }
+            else{
+                if(p2.isAIBot() || p2.isRandomBot()) panel.showWaitingMessage();
+                p2.playTurn();
+            }
             turns++;
         }
     }
+
+    public void setGameState(GameState state){ gameState = state; }
 
     public void connect4FiniteStateMachine(){
         boolean terminateGame = false;
         while(!terminateGame){
             switch(gameState){
                 case Init:
-                    //initialize p1/p2, set strategies, initialize board, etc;
                     gameState = MENU;
                     break;
                 case MENU:
-                    //prompt single/two player, config, terminate
+                    panel.displayMenu();
                     break;
                 case PlayGame:
                     playGame();
@@ -66,6 +84,7 @@ public class Connect4{
                 case End:
                     terminateGame = true;
                     //show terminate message
+                    System.exit(1);
                     break;
             }
         }
@@ -84,6 +103,7 @@ public class Connect4{
         p1.resetWon();
         p2.resetWon();
 
+        turns = 0;
         Board.getInstance().clearBoard();
     }
 }

@@ -1,5 +1,6 @@
 package connect4.strategy;
 
+import connect4.Connect4Panel;
 import connect4.players.Player;
 
 public class AIBotStrategy implements IStrategy{
