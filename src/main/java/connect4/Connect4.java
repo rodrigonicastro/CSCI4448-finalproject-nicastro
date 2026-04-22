@@ -2,6 +2,8 @@ package connect4;
 
 import connect4.players.Player;
 
+import javax.swing.*;
+
 import static connect4.GameState.*;
 
 public class Connect4{
@@ -28,6 +30,8 @@ public class Connect4{
     public Player getP1(){ return p1; }
     public Player getP2(){ return p2; }
 
+    public GameState getState(){ return gameState; }
+
     public void playGame(){
         while(!isOver()){
             if(turns % 2 == 1){
@@ -49,6 +53,19 @@ public class Connect4{
         while(!terminateGame){
             switch(gameState){
                 case Init:
+                    SwingUtilities.invokeLater(() -> {
+                        JFrame frame = new JFrame("Connect 4");
+
+                        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                        frame.setSize(700, 650);
+                        frame.setLocationRelativeTo(null);
+
+                        frame.add(panel);
+                        frame.setVisible(true);
+
+                        panel.requestFocusInWindow();
+                    });
+
                     gameState = MENU;
                     break;
                 case MENU:
@@ -56,24 +73,19 @@ public class Connect4{
                     break;
                 case PlayGame:
                     playGame();
-
+                    panel.showWinnerMessage();
                     if(p1.hasConnected4()){
                         p1.incrementWins();
                         p2.incrementLosses();
-                        //show winner message
                     }
                     else if(p2.hasConnected4()){
                         p1.incrementLosses();
                         p2.incrementWins();
-                        //show winner message
                     }
                     else{
                         p1.incrementDraws();
                         p2.incrementDraws();
-                        //show draw message
                     }
-                    resetGame(p1, p2);
-                    gameState = Results;
                     break;
                 case Results:
                     //show results screen, prompt to terminate or go to menu
@@ -84,7 +96,7 @@ public class Connect4{
                 case End:
                     terminateGame = true;
                     //show terminate message
-                    System.exit(1);
+                    System.exit(0);
                     break;
             }
         }
@@ -99,7 +111,7 @@ public class Connect4{
 
     public boolean isBoardFull(){ return Board.getInstance().isFull(); }
 
-    private void resetGame(Player p1, Player p2){
+    public void resetGame(Player p1, Player p2){
         p1.resetWon();
         p2.resetWon();
 

@@ -7,7 +7,6 @@ import connect4.strategy.StrategyFactory;
 public class Main {
     static void main() {
         PlayerFactory playerFactory = new PlayerFactory();
-        StrategyFactory strategyFactory = new StrategyFactory();
         Connect4 game = new Connect4();
 
         Player p1 = playerFactory.createRandomBot(1, game);

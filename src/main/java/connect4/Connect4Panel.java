@@ -19,6 +19,7 @@ public class Connect4Panel extends JPanel {
     private int chosenColumn;
     private boolean inMenu;
     private int menuIndex = 0;
+    private boolean showWin;
 
     private Color PLAYER_1_COLOR = Color.BLUE;
     private Color PLAYER_2_COLOR = Color.RED;
@@ -35,6 +36,7 @@ public class Connect4Panel extends JPanel {
         this.selectedCol = 0;
         this.activePlayer = 1;
         this.waitingForMove = false;
+        this.showWin = false;
         this.chosenColumn = -1;
         this.game = game;
 
@@ -47,15 +49,27 @@ public class Connect4Panel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
+        if(game.getState() == GameState.MENU){
+            drawMenu(g);
+            return;
+        }
+
+        if(game.getState() == GameState.PlayGame){
+            displayGame(g);
+            return;
+        }
+
+        if(game.getState() == GameState.Results){
+            displayResults(g);
+            return;
+        }
+    }
+
+    public void displayGame(Graphics g){
         int cellSize = 80;
         int offsetX = 50;
         int offsetY = 100;
         int pieceSize = 60;
-
-        if(inMenu){
-            drawMenu(g);
-            return;
-        }
 
         if (showWaitingMessage) {
             g.setColor(Color.BLACK);
@@ -86,6 +100,31 @@ public class Connect4Panel extends JPanel {
             }
         }
 
+        if(showWin){
+            if(game.getP1().hasConnected4()){
+                g.setColor(PLAYER_1_COLOR);
+                g.setFont(new Font("Arial", Font.BOLD, 24));
+                g.drawString("Player 1", 50, 50);
+            }
+            else if(game.getP2().hasConnected4()){
+                g.setColor(PLAYER_2_COLOR);
+                g.setFont(new Font("Arial", Font.BOLD, 24));
+                g.drawString("Player 2", 50, 50);
+            }
+            else{
+                g.setColor(Color.BLACK);
+                g.setFont(new Font("Arial", Font.BOLD, 24));
+                g.drawString("It's a tie!", 50, 50);
+            }
+            if(!game.isBoardFull()){
+                g.setColor(Color.BLACK);
+                g.setFont(new Font("Arial", Font.BOLD, 24));
+                g.drawString("wins!", 150, 50);
+            }
+
+            g.drawString("Press ENTER to go to Results screen", 80, 80);
+        }
+
         if (waitingForMove) {
             if (activePlayer == 1) {
                 g.setColor(PLAYER_1_COLOR);
@@ -107,7 +146,7 @@ public class Connect4Panel extends JPanel {
         for (int row = 0; row < board.getNumRows(); row++) {
             for (int col = 0; col < board.getNumColumns(); col++) {
                 int x = offsetX + col * cellSize + 10;
-                int y = offsetY + row * cellSize + 10;
+                int y = offsetY + (board.getNumRows() - 1 - row) * cellSize + 10;
 
                 if (board.getBoard()[row][col] == 1) {
                     g.setColor(PLAYER_1_COLOR);
@@ -122,6 +161,15 @@ public class Connect4Panel extends JPanel {
         }
     }
 
+    public void goToResults(){
+        game.resetGame(game.getP1(), game.getP2());
+        game.setGameState(GameState.Results);
+    }
+
+    public void displayResults(Graphics g){
+
+    }
+
     public void showWaitingMessage() {
         showWaitingMessage = true;
         repaint();
@@ -134,6 +182,12 @@ public class Connect4Panel extends JPanel {
 
         showWaitingMessage = false;
         repaint();
+    }
+
+    public void showWinnerMessage(){
+        showWin = true;
+        repaint();
+        showWin = false;
     }
 
     public void displayMenu(){
@@ -269,6 +323,9 @@ public class Connect4Panel extends JPanel {
                 }
                 if (inMenu) {
                     handleMenuSelection();
+                }
+                if(showWin){
+                    goToResults();
                 }
             }
         });
