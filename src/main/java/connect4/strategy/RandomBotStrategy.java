@@ -12,7 +12,7 @@ public class RandomBotStrategy implements IStrategy{
     public int determineMove(Player myself){
         int position = rand.nextInt(Board.getInstance().getNumColumns());
 
-        while(!Board.getInstance().isColumnFull(position)){
+        while(Board.getInstance().isColumnFull(position)){
             position = rand.nextInt(Board.getInstance().getNumColumns());
         }
 
