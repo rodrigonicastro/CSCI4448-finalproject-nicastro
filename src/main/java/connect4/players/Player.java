@@ -11,12 +11,12 @@ public class Player {
 
     public Connect4 game;
 
-    protected Board board;
-    protected int num_wins;
-    protected int num_draws;
-    protected int num_losses;
-    protected int player;
-    protected boolean won;
+    Board board;
+    private int num_wins;
+    private int num_draws;
+    private int num_losses;
+    private final int player;
+    private boolean won;
 
     private IStrategy strategy;
 
