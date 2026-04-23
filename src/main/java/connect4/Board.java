@@ -39,8 +39,10 @@ public class Board{
     }
 
     public void clearBoard(){ //sets all slots to 0 to prepare for new game
-        for(int[] col : boardMatrix){
-            for(int slot : col) slot = 0;
+        for(int i = 0; i < rows; i++){
+            for(int j = 0; j < columns; j++){
+                boardMatrix[i][j] = 0;
+            }
         }
     }
 
