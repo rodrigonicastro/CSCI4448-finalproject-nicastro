@@ -7,8 +7,8 @@ import javax.swing.*;
 import static connect4.GameState.*;
 
 public class Connect4{
-    private Player p1; //always User
-    private Player p2; //decide between User, RandomBot, or AIBot
+    private Player p1;
+    private Player p2;
     private GameState gameState;
     public Connect4Panel panel;
 
@@ -30,11 +30,15 @@ public class Connect4{
     public Player getP1(){ return p1; }
     public Player getP2(){ return p2; }
 
+    public int getTurns(){ return turns; }
+
+    public void resetTurns() { turns = 0; }
+
     public GameState getState(){ return gameState; }
 
     public void playGame(){
         while(!isOver()){
-            if(turns % 2 == 1){
+            if(turns % 2 == 0){
                 if(p1.isAIBot() || p1.isRandomBot()) panel.showWaitingMessage();
                 p1.playTurn();
             }
@@ -73,7 +77,6 @@ public class Connect4{
                     break;
                 case PlayGame:
                     playGame();
-                    panel.showWinnerMessage();
                     if(p1.hasConnected4()){
                         p1.incrementWins();
                         p2.incrementLosses();
@@ -86,16 +89,16 @@ public class Connect4{
                         p1.incrementDraws();
                         p2.incrementDraws();
                     }
+                    gameState = ShowWinner;
+                    break;
+                case ShowWinner:
+                    panel.showWinnerMessage();
                     break;
                 case Results:
-                    //show results screen, prompt to terminate or go to menu
+                    panel.showResults();
                     break;
-                case Config:
-                    //prompt choice of rng/AI/User for p2, maybe choose color
-                    //still unsure if this will be implemented
                 case End:
                     terminateGame = true;
-                    //show terminate message
                     System.exit(0);
                     break;
             }

@@ -19,7 +19,9 @@ public class Connect4Panel extends JPanel {
     private int chosenColumn;
     private boolean inMenu;
     private int menuIndex = 0;
+    private int resultsIndex = 0;
     private boolean showWin;
+    private boolean inResults = false;
 
     private Color PLAYER_1_COLOR = Color.BLUE;
     private Color PLAYER_2_COLOR = Color.RED;
@@ -28,6 +30,11 @@ public class Connect4Panel extends JPanel {
             "2-player mode",
             "Play against Random Moves",
             "Play against AI",
+            "Exit game"
+    };
+
+    private String[] resultsOptions = {
+            "Return to menu",
             "Exit game"
     };
 
@@ -54,7 +61,7 @@ public class Connect4Panel extends JPanel {
             return;
         }
 
-        if(game.getState() == GameState.PlayGame){
+        if(game.getState() == GameState.PlayGame || game.getState() == GameState.ShowWinner){
             displayGame(g);
             return;
         }
@@ -74,30 +81,7 @@ public class Connect4Panel extends JPanel {
         if (showWaitingMessage) {
             g.setColor(Color.BLACK);
             g.setFont(new Font("Arial", Font.BOLD, 24));
-            g.drawString("Generating move", 50, 50);
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            g.drawString("Generating move.", 50, 50);
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            g.drawString("Generating move..", 50, 50);
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
             g.drawString("Generating move...", 50, 50);
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
         }
 
         if(showWin){
@@ -162,12 +146,44 @@ public class Connect4Panel extends JPanel {
     }
 
     public void goToResults(){
-        game.resetGame(game.getP1(), game.getP2());
         game.setGameState(GameState.Results);
     }
 
-    public void displayResults(Graphics g){
+    public void showResults(){
+        inResults = true;
+        repaint();
+        inResults = false;
+    }
 
+    public void displayResults(Graphics g){
+        g.setFont(new Font("Arial", Font.BOLD, 24));
+        g.drawString("This game took "+game.getTurns()+" turns!", 100, 50);
+
+        g.setColor(PLAYER_1_COLOR);
+        g.drawString("Player 1:", 50, 100);
+        g.setColor(Color.BLACK);
+        g.drawString("Wins: "+game.getP1().getWins(), 65, 125);
+        g.drawString("Losses: "+game.getP1().getLosses(), 65, 150);
+        g.drawString("Draws: "+game.getP1().getDraws(), 65, 175);
+
+        g.setColor(PLAYER_2_COLOR);
+        g.drawString("Player 2:", 500, 100);
+        g.setColor(Color.BLACK);
+        g.drawString("Wins: "+game.getP2().getWins(), 515, 125);
+        g.drawString("Losses: "+game.getP2().getLosses(), 515, 150);
+        g.drawString("Draws: "+game.getP2().getDraws(), 515, 175);
+
+        if(resultsIndex == 0){
+            g.setColor(Color.GREEN);
+        }
+        g.drawString("Return to menu", 100, 500);
+        if(resultsIndex == 1){
+            g.setColor(Color.GREEN);
+        }
+        else{
+            g.setColor(Color.BLACK);
+        }
+        g.drawString("Exit game", 500, 500);
     }
 
     public void showWaitingMessage() {
@@ -175,7 +191,7 @@ public class Connect4Panel extends JPanel {
         repaint();
 
         try {
-            Thread.sleep(500); // 0.5 seconds
+            Thread.sleep(500);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
@@ -207,12 +223,27 @@ public class Connect4Panel extends JPanel {
 
         for (int i = 0; i < menuOptions.length; i++) {
             if (i == menuIndex) {
-                g.setColor(Color.BLUE);
+                g.setColor(Color.GREEN);
             } else {
                 g.setColor(Color.BLACK);
             }
 
             g.drawString(menuOptions[i], 100, startY + i * 50);
+        }
+    }
+
+    private void handleResultsSelection(){
+        switch (resultsIndex){
+            case 0:
+                Window window = SwingUtilities.getWindowAncestor(this);
+                if (window != null) {
+                    window.dispose();
+                }
+                game.resetGame(game.getP1(), game.getP2());
+                game.setGameState(GameState.Init);
+                break;
+            case 1:
+                game.setGameState(GameState.End);
         }
     }
 
@@ -232,6 +263,7 @@ public class Connect4Panel extends JPanel {
             case 2:
                 game.getP1().setStrategy(strategyFactory.newUserStrategy());
                 game.getP2().setStrategy(strategyFactory.newAIBotStrategy());
+                game.setGameState(GameState.PlayGame);
                 break;
             case 3:
                 game.setGameState(GameState.End);
@@ -262,6 +294,10 @@ public class Connect4Panel extends JPanel {
                     selectedCol = board.getNumColumns()-1;
                     repaint();
                 }
+
+                else if(inResults){
+                    resultsIndex = (resultsIndex - 1 + resultsOptions.length) % resultsOptions.length;
+                }
             }
         });
 
@@ -278,11 +314,14 @@ public class Connect4Panel extends JPanel {
                     selectedCol = 0;
                     repaint();
                 }
+                else if(inResults){
+                    resultsIndex = (resultsIndex + 1) % resultsOptions.length;
+                }
             }
         });
 
         // Player 2 - move left
-        inputMap.put(KeyStroke.getKeyStroke('A'), "p2Left");
+        inputMap.put(KeyStroke.getKeyStroke("A"), "p2Left");
         actionMap.put("p2Left", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -298,7 +337,7 @@ public class Connect4Panel extends JPanel {
         });
 
         // Player 2 - move right
-        inputMap.put(KeyStroke.getKeyStroke('D'), "p2Right");
+        inputMap.put(KeyStroke.getKeyStroke("D"), "p2Right");
         actionMap.put("p2Right", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -326,6 +365,9 @@ public class Connect4Panel extends JPanel {
                 }
                 if(showWin){
                     goToResults();
+                }
+                if(inResults){
+                    handleResultsSelection();
                 }
             }
         });

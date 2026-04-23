@@ -4,6 +4,7 @@ public enum GameState {
     Init,
     MENU,
     PlayGame,
+    ShowWinner,
     Results,
     Config,
     End
