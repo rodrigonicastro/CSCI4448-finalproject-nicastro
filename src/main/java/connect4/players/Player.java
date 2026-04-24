@@ -60,7 +60,7 @@ public class Player {
     public boolean hasConnected4(){ return won; }
 
     public void playTurn(){
-        placeCoin(strategy.determineMove(this));
+        while(!placeCoin(strategy.determineMove(this)));
     }
 
     public boolean isAIBot(){ return strategy.isAIBot(); }
