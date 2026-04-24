@@ -270,6 +270,8 @@ public class Player {
     public int getHorizontalRatingForColumn(int column, int player){
         int landingRow = findLandingRow(column);
 
+        if(landingRow == -1) return 0;
+
         return getLeftRating(column, landingRow, player) + getRightRating(column, landingRow, player);
     }
 
@@ -303,6 +305,8 @@ public class Player {
 
     public int getDiagonalRatingForColumn(int column, int player){
         int landingRow = findLandingRow(column);
+
+        if(landingRow == -1) return 0;
 
         return Math.max(getBottomLeftRating(column, landingRow, player)+getTopRightRating(column, landingRow, player),
                         getTopLeftRating(column, landingRow, player)+getBottomRightRating(column, landingRow, player));
