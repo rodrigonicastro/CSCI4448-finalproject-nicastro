@@ -15,7 +15,6 @@ public class Connect4{
     private int turns;
 
     public Connect4(){
-        panel = new Connect4Panel(this);
         this.gameState = Init;
     }
 
@@ -25,14 +24,17 @@ public class Connect4{
         return this;
     }
 
+    public Connect4 addPanel(Connect4Panel panel){
+        this.panel = panel;
+        return this;
+    }
+
     public Connect4Panel getPanel(){ return panel; }
 
     public Player getP1(){ return p1; }
     public Player getP2(){ return p2; }
 
     public int getTurns(){ return turns; }
-
-    public void resetTurns() { turns = 0; }
 
     public GameState getState(){ return gameState; }
 
