@@ -277,11 +277,12 @@ public class Player {
         if(column == 0) return 0;
 
         int leftBorder = Math.max(0, column - 3);
+        int opponent = player == 1 ? 2 : 1;
 
         int rating = 0;
         for(int i = column - 1; i >= leftBorder; i--){
             if(board.getBoard()[row][i] == player) rating++;
-            else break;
+            else if(board.getBoard()[row][i] == opponent) break;
         }
         return rating;
     }
@@ -290,11 +291,12 @@ public class Player {
         if(column == board.getNumColumns() - 1) return 0;
 
         int rightBorder = Math.min(board.getNumColumns() - 1, column + 3);
+        int opponent = player == 1 ? 2 : 1;
 
         int rating = 0;
         for(int i = column; i <= rightBorder; i++){
             if(board.getBoard()[row][i] == player) rating++;
-            else break;
+            else if(board.getBoard()[row][i] == opponent) break;
         }
         return rating;
     }
