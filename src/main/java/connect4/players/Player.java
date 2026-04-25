@@ -44,7 +44,7 @@ public class Player {
         return false;
     }
 
-    protected IStrategy getStrategy() { return strategy; }
+    public IStrategy getStrategy() { return strategy; }
 
     public void setStrategy(IStrategy strategy) { this.strategy = strategy; }
 
