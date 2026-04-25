@@ -1,7 +1,8 @@
-import connect4.Board;
-import connect4.Connect4;
+package connect4;
+
 import connect4.players.Player;
 import connect4.players.PlayerFactory;
+import connect4.strategy.UserStrategy;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,6 +30,8 @@ public class PlayerTest {
         Player user = PlayerFactory.createUser(1, game);
         assertTrue(user.isUser());
         assertEquals(1, user.getPlayer());
+        assertEquals(game, user.getGame());
+        assertInstanceOf(UserStrategy.class, user.getStrategy());
     }
 
     @Test

@@ -28,6 +28,7 @@ public class BoardStepDefs {
         Board emptyBoard = Board.getInstance();
         emptyBoard.clearBoard();
 
+        game.resetGame(p1, p2);
         state.updateState(p1, p2, board.getBoard(), game);
     }
 
