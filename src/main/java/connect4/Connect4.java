@@ -1,21 +1,20 @@
 package connect4;
 
 import connect4.players.Player;
-
-import javax.swing.*;
-
-import static connect4.GameState.*;
+import connect4.state.IState;
+import connect4.state.InitState;
 
 public class Connect4{
     private Player p1;
     private Player p2;
-    private GameState gameState;
     public Connect4Panel panel;
+
+    private IState currentState;
 
     private int turns;
 
     public Connect4(){
-        this.gameState = Init;
+        currentState = new InitState();
     }
 
     public Connect4 addPlayers(Player p1, Player p2){
@@ -36,7 +35,9 @@ public class Connect4{
 
     public int getTurns(){ return turns; }
 
-    public GameState getState(){ return gameState; }
+    public void setGameState(IState state){ this.currentState = state; }
+
+    public IState getCurrentState(){ return currentState; }
 
     public void playGame(){
         while(!isOver()){
@@ -52,58 +53,9 @@ public class Connect4{
         }
     }
 
-    public void setGameState(GameState state){ gameState = state; }
-
     public void connect4FiniteStateMachine(){
-        boolean terminateGame = false;
-        while(!terminateGame){
-            switch(gameState){
-                case Init:
-                    SwingUtilities.invokeLater(() -> {
-                        JFrame frame = new JFrame("Connect 4");
-
-                        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                        frame.setSize(700, 650);
-                        frame.setLocationRelativeTo(null);
-
-                        frame.add(panel);
-                        frame.setVisible(true);
-
-                        panel.requestFocusInWindow();
-                    });
-
-                    gameState = MENU;
-                    break;
-                case MENU:
-                    panel.displayMenu();
-                    break;
-                case PlayGame:
-                    playGame();
-                    if(p1.hasConnected4()){
-                        p1.incrementWins();
-                        p2.incrementLosses();
-                    }
-                    else if(p2.hasConnected4()){
-                        p1.incrementLosses();
-                        p2.incrementWins();
-                    }
-                    else{
-                        p1.incrementDraws();
-                        p2.incrementDraws();
-                    }
-                    gameState = ShowWinner;
-                    break;
-                case ShowWinner:
-                    panel.showWinnerMessage();
-                    break;
-                case Results:
-                    panel.showResults();
-                    break;
-                case End:
-                    terminateGame = true;
-                    System.exit(0);
-                    break;
-            }
+        while(true){
+            currentState.executeState(this);
         }
     }
 

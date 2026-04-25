@@ -1,5 +1,9 @@
 package connect4;
 
+import connect4.state.EndState;
+import connect4.state.InitState;
+import connect4.state.PlayGameState;
+import connect4.state.ResultsState;
 import connect4.strategy.StrategyFactory;
 
 import javax.swing.*;
@@ -7,8 +11,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 
 public class Connect4Panel extends JPanel {
-
-    // --- Fields ---
     Board board = Board.getInstance();
     Connect4 game;
 
@@ -38,7 +40,6 @@ public class Connect4Panel extends JPanel {
             "Exit game"
     };
 
-    // --- Constructor ---
     public Connect4Panel(Connect4 game) {
         this.selectedCol = 0;
         this.activePlayer = 1;
@@ -51,22 +52,21 @@ public class Connect4Panel extends JPanel {
         setupKeyBindings();
     }
 
-    // --- Rendering ---
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        if(game.getState() == GameState.MENU){
+        if(game.getCurrentState().isMenuState()){
             drawMenu(g);
             return;
         }
 
-        if(game.getState() == GameState.PlayGame || game.getState() == GameState.ShowWinner){
+        if(game.getCurrentState().isPlayGameState() || game.getCurrentState().isShowWinnerState()){
             displayGame(g);
             return;
         }
 
-        if(game.getState() == GameState.Results){
+        if(game.getCurrentState().isResultsState()){
             displayResults(g);
             return;
         }
@@ -146,7 +146,7 @@ public class Connect4Panel extends JPanel {
     }
 
     public void goToResults(){
-        game.setGameState(GameState.Results);
+        game.setGameState(new ResultsState());
     }
 
     public void showResults(){
@@ -240,10 +240,10 @@ public class Connect4Panel extends JPanel {
                     window.dispose();
                 }
                 game.resetGame(game.getP1(), game.getP2());
-                game.setGameState(GameState.Init);
+                game.setGameState(new InitState());
                 break;
             case 1:
-                game.setGameState(GameState.End);
+                game.setGameState(new EndState());
         }
     }
 
@@ -253,24 +253,23 @@ public class Connect4Panel extends JPanel {
             case 0:
                 game.getP1().setStrategy(strategyFactory.newUserStrategy());
                 game.getP2().setStrategy(strategyFactory.newUserStrategy());
-                game.setGameState(GameState.PlayGame);
+                game.setGameState(new PlayGameState());
                 break;
             case 1:
                 game.getP1().setStrategy(strategyFactory.newUserStrategy());
                 game.getP2().setStrategy(strategyFactory.newRandomBotStrategy());
-                game.setGameState(GameState.PlayGame);
+                game.setGameState(new PlayGameState());
                 break;
             case 2:
                 game.getP1().setStrategy(strategyFactory.newUserStrategy());
                 game.getP2().setStrategy(strategyFactory.newAIBotStrategy());
-                game.setGameState(GameState.PlayGame);
+                game.setGameState(new PlayGameState());
                 break;
             case 3:
-                game.setGameState(GameState.End);
+                game.setGameState(new EndState());
                 break;
         }
 
-        // Leave menu (you can adjust this later)
         inMenu = false;
         repaint();
     }
