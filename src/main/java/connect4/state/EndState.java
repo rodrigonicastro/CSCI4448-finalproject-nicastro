@@ -6,4 +6,7 @@ public class EndState implements IState{
     public void executeState(Connect4 game){
         System.exit(0);
     }
+
+    @Override
+    public boolean isEndState(){ return true; }
 }
